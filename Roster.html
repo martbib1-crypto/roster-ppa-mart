@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Roster PPA Mart Jan 2026</title>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+
+  @media (max-width: 768px) {
+  body {
+    font-size: 11px;
+  }
+
+  td, th {
+    padding: 3px 4px;
+  }
+  }
+
+  th, td { white-space: nowrap; }
+
+  /* Sticky columns */
+  .col-nik {
+  position: sticky;
+  left: 0;
+  z-index: 20;
+  background: #f9fafb;
+  text-align: left;
+  padding: 4px 6px;
+  font-size: 11px;
+  color: #374151;
+
+  min-width: 80px;
+  max-width: 80px;
+  }
+
+  .col-nama {
+  position: sticky;
+  left: 80px; /* HARUS SAMA DENGAN LEBAR NIK */
+  z-index: 20;
+  background: #f9fafb;
+  text-align: left;
+  padding: 4px 8px;
+  font-weight: 600;
+
+  min-width: 160px;
+  }
+
+
+  .sticky-top {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+  }
+
+  /* shift colors tetap */
+/* WARNA SHIFT – KONTRAS TEGAS TAPI DEWASA */
+
+.shift-P {
+  background: rgb(1, 107, 254);
+  border: 1px solid #212121;
+  color: black;
+}
+
+.shift-S {
+  background: rgb(2, 249, 2);
+  border: 1px solid #212121;
+  color: black;
+}
+
+.shift-M {
+  background: #fed669;
+  border: 1px solid #212121;
+  color: black;
+}
+
+.shift-C {
+  background: #747475;
+  border: 1px solid #212121;
+  color: #fcfbfd;
+}
+
+.shift-OFF {
+  background: #fa0202;
+  border: 1px solid #212121;
+  color: #f5f6f7;
+}
+
+.shift-STND {
+  background: #fafaf9;
+  border: 1px solid #212121;
+  color: black;
+}
+
+.shift-INDUKSI {
+  background: rgb(2, 249, 2);
+  border: 1px solid #212121;
+  color: black;
+}
+/* ===== SHIFT PAGI TURUNAN ===== */
+
+.shift-PMO {
+  background: green;
+  border: 1px solid #212121;
+  color: white;
+}
+.shift-POP {
+  background: yellow;
+  border: 1px solid #212121;
+  color: black;
+}
+.shift-PMP {
+  background: orange;
+  border: 1px dashed #212121;
+  color: black;
+}
+
+.shift-SMP {
+  background: purple;
+  border: 1px dashed #212121;
+  color: white;
+}
+
+.shift-MOP {
+  background: white;
+  border: 1px dashed #212121;
+  color: black;
+}
+
+</style>
+
+</head>
+
+<body class="bg-gray-100 p-4 text-xs">
+
+<h1 class="text-xl font-bold mb-3">Roster PPA Mart Jan 2026</h1>
+
+<!-- LEGEND -->
+<div class="flex flex-wrap gap-2 mb-3 text-xs">
+  <span class="shift-P px-2 py-1 rounded">P = Pagi</span>
+  <span class="shift-S px-2 py-1 rounded">S = Sore</span>
+  <span class="shift-M px-2 py-1 rounded">M = Middle</span>
+  <span class="shift-C px-2 py-1 rounded">C = Cuti</span>
+  <span class="shift-OFF px-2 py-1 rounded">OFF</span>
+  <span class="shift-STND px-2 py-1 rounded">STND</span>
+  <span class="shift-INDUKSI px-2 py-1 rounded">INDUKSI</span>
+</div>
+
+<div class="overflow-auto bg-white rounded shadow max-h-[80vh]">
+<table id="rosterTable" class="border-collapse"></table>
+</div>
+
+<script>
+fetch('Roster.csv')
+.then(res => res.text())
+.then(text => {
+  const rows = text.trim().split('\n').map(r => r.split(';').map(c => c.trim()));
+  const table = document.getElementById('rosterTable');
+
+  let html = '<thead class="sticky-top bg-gray-200"><tr>';
+  rows[0].forEach((h, i) => {
+    if (i === 0)
+      html += `<th class="sticky-left px-2 py-1 border">NAMA</th>`;
+    else if (i === 1)
+      html += `<th class="sticky-left-2 px-2 py-1 border">JABATAN</th>`;
+    else
+      html += `<th class="px-2 py-1 border text-center">${h}</th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  rows.slice(1).forEach(row => {
+  const section = row[0]?.toUpperCase();
+
+  if (['KASIR', 'OPERASIONAL', 'BACK OFFICE'].includes(section)) {
+    let bg = 'bg-slate-900';
+    if (section === 'KASIR') bg = 'bg-emerald-700';
+    if (section === 'OPERASIONAL') bg = 'bg-slate-800';
+    if (section === 'BACK OFFICE') bg = 'bg-indigo-800';
+
+    html += `
+      <tr class="${bg} text-white sticky-top">
+        <td colspan="${rows[0].length}"
+            class="px-3 py-2 font-bold tracking-wide">
+          ${section}
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  html += '<tr>';
+
+  row.forEach((cell, i) => {
+    let cls = 'px-2 py-[2px] border text-center';
+
+    if (i === 0) cls += ' col-nik';  
+    if (i === 1) cls += ' col-nama';
+
+    if (i > 1) {
+      cls += ` shift-${cell.replace(/\s/g,'')}`;
+    }
+
+    html += `<td class="${cls}">${cell}</td>`;
+  });
+
+  html += '</tr>';
+});
+
+  html += '</tbody>';
+  table.innerHTML = html;
+});
+</script>
+
+</body>
+</html>
