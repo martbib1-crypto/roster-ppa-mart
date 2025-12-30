@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Roster PPA Mart Jan 2026</title>
+<title>Roster PPA Mart 2026</title>
 <script src="https://cdn.tailwindcss.com"></script>
 
 <style>
@@ -20,32 +20,30 @@
   th, td { white-space: nowrap; }
 
   /* Sticky columns */
+ 
   .col-nik {
   position: sticky;
   left: 0;
   z-index: 20;
   background: #f9fafb;
-  text-align: left;
+  text-align: center;
   padding: 4px 6px;
   font-size: 11px;
   color: #374151;
-
   min-width: 80px;
   max-width: 80px;
-  }
+}
 
-  .col-nama {
+.col-nama {
   position: sticky;
-  left: 80px; /* HARUS SAMA DENGAN LEBAR NIK */
+  left: 80px;
   z-index: 20;
   background: #f9fafb;
-  text-align: left;
+  text-align: center;
   padding: 4px 8px;
   font-weight: 600;
-
   min-width: 160px;
-  }
-
+}
 
   .sticky-top {
     position: sticky;
@@ -53,8 +51,16 @@
     z-index: 30;
   }
 
-  /* shift colors tetap */
-/* WARNA SHIFT – KONTRAS TEGAS TAPI DEWASA */
+  td.col-nik {
+    text-align: center;
+    font-weight: 700;
+  }
+
+  td.col-nama {
+    text-align: left;
+    padding-left: 10px;
+  }
+
 
 .shift-P {
   background: rgb(1, 107, 254);
@@ -97,7 +103,6 @@
   border: 1px solid #212121;
   color: black;
 }
-/* ===== SHIFT PAGI TURUNAN ===== */
 
 .shift-PMO {
   background: green;
@@ -127,16 +132,27 @@
   color: black;
 }
 
+.today-header {
+  border-left: 3px solid red !important;
+  border-right: 3px solid red !important;
+  font-weight: 700;
+}
+
+.today-col {
+  border-left: 3px solid #374151 !important;
+  border-right: 3px solid #374151 !important;
+}
+
 </style>
 
 </head>
 
 <body class="bg-gray-100 p-4 text-xs">
 
-<h1 class="text-xl font-bold mb-3">Roster PPA Mart Jan 2026</h1>
+<h1 class="text-xl font-bold mb-3">ROSTER PPA MART 2026</h1>
 
-<!-- LEGEND -->
-<div class="flex flex-wrap gap-2 mb-3 text-xs">
+<!-- LEGEND SHIFT -->
+<div class="flex flex-wrap gap-2 mb-2 text-xs">
   <span class="shift-P px-2 py-1 rounded">P = Pagi</span>
   <span class="shift-S px-2 py-1 rounded">S = Sore</span>
   <span class="shift-M px-2 py-1 rounded">M = Middle</span>
@@ -146,8 +162,45 @@
   <span class="shift-INDUKSI px-2 py-1 rounded">INDUKSI</span>
 </div>
 
+<!-- LEGEND KODE CABANG -->
+<div class="flex flex-wrap gap-3 mb-3 text-xs text-gray-700">
+  <span><strong>MO</strong> = Main Office</span>
+  <span><strong>MP</strong> = Manpower</span>
+  <span><strong>OP</strong> = Office Plant</span>
+</div>
+
 <div class="overflow-auto bg-white rounded shadow max-h-[80vh]">
+<div class="flex flex-wrap items-center gap-4 mb-3 text-xs text-gray-600">
+  <div id="periodText">
+    Periode: <strong>Januari 2026</strong>
+  </div>
+  <div id="lastUpdated">
+    Last updated: memuat...
+  </div>
+  <div class="italic text-gray-500">
+    Jadwal dapat berubah sesuai kebutuhan operasional
+  </div>
+</div>
+
 <table id="rosterTable" class="border-collapse"></table>
+
+<!-- KETERANGAN JAM KERJA -->
+
+<div class="mt-3 border-t pt-2 text-xs text-gray-700">
+  <div class="font-semibold mb-1">Keterangan Jam Kerja Shift:</div>
+  <ul class="list-disc pl-5 space-y-1">
+    <li><strong>P</strong> : 05.00 – 16.00</li>
+    <li><strong>P MP</strong> : 06.00 – 17.00</li>
+    <li><strong>P OP</strong> : 06.00 – 17.00</li>
+    <li><strong>P MO</strong> : 07.00 – 18.00</li>
+    <li><strong>M</strong> : 08.00 – 19.00</li>
+    <li><strong>M OP</strong> : 17.00 – 04.00</li>
+    <li><strong>STND</strong> : 09.00 – 20.00</li>
+    <li><strong>S</strong> : 11.00 – 22.00</li>
+    <li><strong>S MP</strong> : 10.30 – 21.30</li>
+    <li><strong>INDUKSI</strong> : 11.00 – 22.00</li>
+  </ul>
+</div>
 </div>
 
 <script>
@@ -158,58 +211,71 @@ fetch('Roster.csv')
   const table = document.getElementById('rosterTable');
 
   let html = '<thead class="sticky-top bg-gray-200"><tr>';
+  const today = new Date().getDate().toString();
+
+  // ===== HEADER (TH) =====
   rows[0].forEach((h, i) => {
     if (i === 0)
-      html += `<th class="sticky-left px-2 py-1 border">NAMA</th>`;
+      html += `<th class="col-nik border sticky-top">NIK</th>`;
     else if (i === 1)
-      html += `<th class="sticky-left-2 px-2 py-1 border">JABATAN</th>`;
-    else
-      html += `<th class="px-2 py-1 border text-center">${h}</th>`;
+      html += `<th class="col-nama border sticky-top">NAMA</th>`;
+    else {
+      const isToday = h === today;
+      html += `<th class="px-2 py-1 border text-center sticky-top ${
+        isToday ? 'today-header' : ''
+      }">${h}</th>`;
+    }
   });
+
   html += '</tr></thead><tbody>';
 
+  // ===== BODY (TD) =====
   rows.slice(1).forEach(row => {
-  const section = row[0]?.toUpperCase();
+    const section = row[0]?.toUpperCase();
 
-  if (['KASIR', 'OPERASIONAL', 'BACK OFFICE'].includes(section)) {
-    let bg = 'bg-slate-900';
-    if (section === 'KASIR') bg = 'bg-emerald-700';
-    if (section === 'OPERASIONAL') bg = 'bg-slate-800';
-    if (section === 'BACK OFFICE') bg = 'bg-indigo-800';
+    // SECTION HEADER
+    if (['KASIR', 'OPERASIONAL', 'BACK OFFICE'].includes(section)) {
+      let bg = 'bg-slate-900';
+      if (section === 'KASIR') bg = 'bg-emerald-700';
+      if (section === 'OPERASIONAL') bg = 'bg-slate-800';
+      if (section === 'BACK OFFICE') bg = 'bg-indigo-800';
 
-    html += `
-      <tr class="${bg} text-white sticky-top">
-        <td colspan="${rows[0].length}"
-            class="px-3 py-2 font-bold tracking-wide">
-          ${section}
-        </td>
-      </tr>
-    `;
-    return;
-  }
-
-  html += '<tr>';
-
-  row.forEach((cell, i) => {
-    let cls = 'px-2 py-[2px] border text-center';
-
-    if (i === 0) cls += ' col-nik';  
-    if (i === 1) cls += ' col-nama';
-
-    if (i > 1) {
-      cls += ` shift-${cell.replace(/\s/g,'')}`;
+      html += `
+        <tr class="${bg} text-white sticky-top">
+          <td colspan="${rows[0].length}"
+              class="px-3 py-2 font-bold tracking-wide">
+            ${section}
+          </td>
+        </tr>
+      `;
+      return;
     }
 
-    html += `<td class="${cls}">${cell}</td>`;
-  });
+    html += '<tr>';
 
-  html += '</tr>';
-});
+    row.forEach((cell, i) => {
+      let cls = 'px-2 py-[2px] border text-center';
+
+      if (i === 0) cls += ' col-nik';
+      if (i === 1) cls += ' col-nama';
+
+      if (i > 1) {
+        cls += ` shift-${cell.replace(/\s/g,'')}`;
+
+        // 👉 HIGHLIGHT KOLOM HARI INI
+        const isToday = rows[0][i] === today;
+        if (isToday) cls += ' today-col';
+      }
+
+      html += `<td class="${cls}">${cell}</td>`;
+    });
+
+    html += '</tr>';
+  });
 
   html += '</tbody>';
   table.innerHTML = html;
 });
 </script>
-
 </body>
 </html>
