@@ -34,33 +34,30 @@
   max-width: 80px;
 }
 
+/* HEADER ATAS */
+.sticky-top {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+/* NIK */
+.col-nik {
+  position: sticky;
+  left: 0;
+  z-index: 50; /* LEBIH TINGGI DARI HEADER */
+  background: #f9fafb;
+  text-align: center;
+}
+
+/* NAMA */
 .col-nama {
   position: sticky;
   left: 80px;
-  z-index: 20;
+  z-index: 50; /* LEBIH TINGGI DARI HEADER */
   background: #f9fafb;
-  text-align: center;
-  padding: 4px 8px;
-  font-weight: 600;
-  min-width: 160px;
+  text-align: left;
 }
-
-  .sticky-top {
-    position: sticky;
-    top: 0;
-    z-index: 30;
-  }
-
-  td.col-nik {
-    text-align: center;
-    font-weight: 700;
-  }
-
-  td.col-nama {
-    text-align: left;
-    padding-left: 10px;
-  }
-
 
 .shift-P {
   background: rgb(1, 107, 254);
@@ -249,9 +246,9 @@ fetch('Roster.csv')
   // ===== HEADER (TH) =====
   rows[0].forEach((h, i) => {
     if (i === 0)
-      html += `<th class="col-nik border sticky-top">NIK</th>`;
+  html += `<th class="col-nik border sticky-top text-center">NIK</th>`;
     else if (i === 1)
-      html += `<th class="col-nama border sticky-top">NAMA</th>`;
+  html += `<th class="col-nama border sticky-top text-left">NAMA</th>`;
     else {
       const isToday = h === today;
       html += `<th class="px-2 py-1 border text-center sticky-top ${
@@ -360,6 +357,7 @@ document.getElementById('downloadKasir').addEventListener('click', () => {
 
 </body>
 </html>
+
 
 
 
