@@ -15,7 +15,6 @@ th, td { white-space: nowrap; }
 
 /* ================= STICKY ================= */
 
-/* Header atas */
 .sticky-top {
   position: sticky;
   top: 0;
@@ -23,7 +22,6 @@ th, td { white-space: nowrap; }
   background: #e5e7eb;
 }
 
-/* Kolom kiri */
 .col-nik {
   position: sticky;
   left: 0;
@@ -61,67 +59,46 @@ th, td { white-space: nowrap; }
 .shift-SMP { background:#7c3aed; color:#fff; border:1px dashed #222; }
 .shift-MOP { background:#ffffff; color:#000; border:1px dashed #222; }
 
-/* HIGHLIGHT HARI INI — BORDER SAJA */
-.today-header {
-  border-left: 3px solid #dc2626 !important;
-  border-right: 3px solid #dc2626 !important;
-  font-weight: 700;
-}
-
+/* HIGHLIGHT HARI INI */
+.today-header,
 .today-col {
   border-left: 3px solid #dc2626 !important;
   border-right: 3px solid #dc2626 !important;
 }
-  
+
 /* Samakan lebar kolom shift */
 td:not(.col-nik):not(.col-nama),
 th:not(.col-nik):not(.col-nama) {
+  width: 44px;
   min-width: 44px;
   max-width: 44px;
-  width: 44px;
 }
 
+/* PEMISAH BULAN */
+.month-separator {
+  width: 8px;
+  min-width: 8px;
+  background: repeating-linear-gradient(
+    45deg,
+    #d1d5db,
+    #d1d5db 2px,
+    #f9fafb 2px,
+    #f9fafb 6px
+  );
+  border-left: 2px solid #9ca3af;
+  border-right: 2px solid #9ca3af;
+}
 </style>
 </head>
 
-<body class="p-4 text-xs"
-style="
-  background-color:#f4f6f8;
-  background-image:
-    repeating-linear-gradient(
-      45deg,
-      rgba(0,0,0,0.02) 0,
-      rgba(0,0,0,0.02) 1px,
-      transparent 1px,
-      transparent 4px
-    );
-">
+<body class="p-4 text-xs" style="background:#f4f6f8">
 
-<!-- HEADER -->
 <div class="flex items-center gap-3 mb-3">
-  <img src="Logo PPA Mart.png" alt="PPA Mart" class="h-14 object-contain">
+  <img src="Logo PPA Mart.png" class="h-14">
   <div>
-    <h1 class="text-xl font-bold leading-tight">Roster PPA Mart 2026</h1>
+    <h1 class="text-xl font-bold">Roster PPA Mart 2026</h1>
     <div class="text-xs text-gray-500">Koperasi Karyawan PPA Sejahtera</div>
   </div>
-</div>
-
-<!-- LEGEND SHIFT -->
-<div class="flex flex-wrap gap-2 mb-2 text-xs">
-  <span class="shift-P px-2 py-1 rounded">P = Pagi</span>
-  <span class="shift-S px-2 py-1 rounded">S = Siang</span>
-  <span class="shift-M px-2 py-1 rounded">M = Middle</span>
-  <span class="shift-C px-2 py-1 rounded">C = Cuti</span>
-  <span class="shift-OFF px-2 py-1 rounded">OFF</span>
-  <span class="shift-STN px-2 py-1 rounded">STN</span>
-  <span class="shift-IND px-2 py-1 rounded">IND</span>
-</div>
-
-<!-- LEGEND KODE -->
-<div class="flex flex-wrap gap-4 mb-3 text-xs text-gray-700">
-  <span><b>MO</b> Main Office</span>
-  <span><b>MP</b> Manpower</span>
-  <span><b>OP</b> Office Plant</span>
 </div>
 
 <div class="overflow-auto bg-white rounded shadow max-h-[80vh]">
@@ -131,118 +108,75 @@ style="
   </div>
 
   <table id="rosterTable" class="border-collapse"></table>
-
-  <button id="downloadKasir"
-    class="m-2 px-3 py-1 text-xs rounded bg-blue-700 text-white hover:bg-blue-800">
-    ⬇ Download Kasir (CSV)
-  </button>
-
-  <div class="mt-3 border-t pt-2 text-xs text-gray-700 px-2">
-    <b>Keterangan Jam Kerja:</b>
-    <ul class="list-disc pl-5 mt-1 space-y-1">
-      <li>P : 05.00 – 16.00</li>
-      <li>P MP / OP : 06.00 – 17.00</li>
-      <li>P MO : 07.00 – 18.00</li>
-      <li>M : 08.00 – 19.00</li>
-      <li>M OP : 17.00 – 04.00</li>
-      <li>S : 11.00 – 22.00</li>
-      <li>S MP : 10.30 – 21.30</li>
-      <li>STN : 09.00 – 20.00</li>
-      <li>IND : 11.00 – 22.00</li>
-    </ul>
-  </div>
 </div>
 
 <script>
-fetch('Roster.csv', { cache: 'no-store' })
-.then(res => res.text())
-.then(text => {
-  const rows = text.trim().split('\n').map(r => r.split(';').map(c => c.trim()));
-  const table = document.getElementById('rosterTable');
+fetch('Roster.csv',{cache:'no-store'})
+.then(res=>{
+  const lm=res.headers.get('Last-Modified');
+  document.getElementById('lastUpdated').innerText =
+    'Last updated: ' + (lm ? new Date(lm).toLocaleString('id-ID') : 'baru saja');
+  return res.text();
+})
+.then(text=>{
+  const rows=text.trim().split('\n').map(r=>r.split(';').map(c=>c.trim()));
+  const table=document.getElementById('rosterTable');
 
-  const today = new Date();
-  today.setHours(0,0,0,0);
+  const today=new Date(); today.setHours(0,0,0,0);
+  const end=new Date(today); end.setDate(today.getDate()+30);
 
-  const endDate = new Date(today);
-  endDate.setDate(today.getDate() + 30);
-
-  const visibleIdx = [];
-  const visibleDates = [];
-
-  rows[0].forEach((h, i) => {
-    if (i < 2) {
-      visibleIdx.push(i);
-      return;
-    }
-    const d = new Date(h);
-    if (!isNaN(d) && d >= today && d <= endDate) {
-      visibleIdx.push(i);
-      visibleDates.push(d);
-    }
+  const idx=[], dates=[];
+  rows[0].forEach((h,i)=>{
+    if(i<2){idx.push(i);return;}
+    const d=new Date(h);
+    if(!isNaN(d)&&d>=today&&d<=end){idx.push(i);dates.push(d);}
   });
 
-  // ===== HITUNG PERIODE OTOMATIS =====
-  if (visibleDates.length) {
-    const start = visibleDates[0];
-    const end = visibleDates[visibleDates.length - 1];
-
-    const bulan = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
-
-    let periode;
-    if (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
-      periode = `${bulan[start.getMonth()]} ${start.getFullYear()}`;
-    } else {
-      periode = `${bulan[start.getMonth()]}–${bulan[end.getMonth()]} ${end.getFullYear()}`;
-    }
-
-    document.querySelector('[data-periode]').innerText = periode;
+  if(dates.length){
+    const b=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+    const s=dates[0], e=dates.at(-1);
+    document.querySelector('[data-periode]').innerText =
+      s.getMonth()===e.getMonth() && s.getFullYear()===e.getFullYear()
+      ? `${b[s.getMonth()]} ${s.getFullYear()}`
+      : `${b[s.getMonth()]}–${b[e.getMonth()]} ${e.getFullYear()}`;
   }
 
-  let html = '<thead><tr class="sticky-top">';
-  visibleIdx.forEach(i => {
-    if (i === 0) html += '<th class="col-nik border">NIK</th>';
-    else if (i === 1) html += '<th class="col-nama border">NAMA</th>';
-    else {
-      const d = new Date(rows[0][i]);
-      const isToday = d.getTime() === today.getTime();
-      html += `<th class="border text-center ${isToday ? 'today-header' : ''}">
-                ${d.getDate()}
-              </th>`;
-    }
+  let html='<thead><tr class="sticky-top">';
+  let lastM=null;
+  idx.forEach(i=>{
+    if(i===0){html+='<th class="col-nik border">NIK</th>';return;}
+    if(i===1){html+='<th class="col-nama border">NAMA</th>';return;}
+    const d=new Date(rows[0][i]);
+    if(lastM!==null && d.getMonth()!==lastM) html+='<th class="month-separator"></th>';
+    html+=`<th class="border text-center ${d.getTime()===today.getTime()?'today-header':''}">${d.getDate()}</th>`;
+    lastM=d.getMonth();
   });
-  html += '</tr></thead><tbody>';
+  html+='</tr></thead><tbody>';
 
-  rows.slice(1).forEach(row => {
-    const sec = row[0]?.toUpperCase();
-    if (['KASIR','OPERASIONAL','BACK OFFICE'].includes(sec)) {
-      html += `<tr class="bg-slate-800 text-white">
-        <td colspan="${visibleIdx.length}" class="px-3 py-2 font-bold">${sec}</td>
-      </tr>`;
+  rows.slice(1).forEach(r=>{
+    const sec=r[0]?.toUpperCase();
+    if(['KASIR','OPERASIONAL','BACK OFFICE'].includes(sec)){
+      html+=`<tr class="bg-slate-800 text-white">
+        <td colspan="${idx.length*2}" class="px-3 py-2 font-bold">${sec}</td></tr>`;
       return;
     }
-
-    html += '<tr>';
-    visibleIdx.forEach(i => {
-      let cls = 'border text-center';
-      if (i === 0) cls += ' col-nik';
-      if (i === 1) cls += ' col-nama';
-      if (i > 1) {
-        const d = new Date(rows[0][i]);
-        if (d.getTime() === today.getTime()) cls += ' today-col';
-        cls += ` shift-${(row[i] || '').replace(/\s/g,'')}`;
+    html+='<tr>'; lastM=null;
+    idx.forEach(i=>{
+      if(i<2){
+        html+=`<td class="border ${i===0?'col-nik':'col-nama'}">${r[i]||''}</td>`;
+        return;
       }
-      html += `<td class="${cls}">${row[i] || ''}</td>`;
+      const d=new Date(rows[0][i]);
+      if(lastM!==null && d.getMonth()!==lastM) html+='<td class="month-separator"></td>';
+      html+=`<td class="border text-center shift-${(r[i]||'').replace(/\s/g,'')} ${d.getTime()===today.getTime()?'today-col':''}">${r[i]||''}</td>`;
+      lastM=d.getMonth();
     });
-    html += '</tr>';
+    html+='</tr>';
   });
 
-  html += '</tbody>';
-  table.innerHTML = html;
+  table.innerHTML=html+'</tbody>';
 });
 </script>
 
 </body>
 </html>
-
-
-
