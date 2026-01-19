@@ -126,7 +126,7 @@ style="
 
 <div class="overflow-auto bg-white rounded shadow max-h-[80vh]">
   <div class="flex gap-4 mb-2 text-xs text-gray-600 px-1">
-    <div>Periode: <b>Jan-Feb 2026</b></div>
+    <div>Periode: <b data-periode>memuat...</b></div>
     <div id="lastUpdated">Last updated: memuat...</div>
   </div>
 
@@ -166,8 +166,9 @@ fetch('Roster.csv', { cache: 'no-store' })
   const endDate = new Date(today);
   endDate.setDate(today.getDate() + 30);
 
-  // Tentukan kolom yang ditampilkan
   const visibleIdx = [];
+  const visibleDates = [];
+
   rows[0].forEach((h, i) => {
     if (i < 2) {
       visibleIdx.push(i);
@@ -176,8 +177,26 @@ fetch('Roster.csv', { cache: 'no-store' })
     const d = new Date(h);
     if (!isNaN(d) && d >= today && d <= endDate) {
       visibleIdx.push(i);
+      visibleDates.push(d);
     }
   });
+
+  // ===== HITUNG PERIODE OTOMATIS =====
+  if (visibleDates.length) {
+    const start = visibleDates[0];
+    const end = visibleDates[visibleDates.length - 1];
+
+    const bulan = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+
+    let periode;
+    if (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
+      periode = `${bulan[start.getMonth()]} ${start.getFullYear()}`;
+    } else {
+      periode = `${bulan[start.getMonth()]}–${bulan[end.getMonth()]} ${end.getFullYear()}`;
+    }
+
+    document.querySelector('[data-periode]').innerText = periode;
+  }
 
   let html = '<thead><tr class="sticky-top">';
   visibleIdx.forEach(i => {
@@ -224,5 +243,6 @@ fetch('Roster.csv', { cache: 'no-store' })
 
 </body>
 </html>
+
 
 
