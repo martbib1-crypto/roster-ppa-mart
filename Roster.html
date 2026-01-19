@@ -147,75 +147,72 @@ style="
 </div>
 
 <script>
-fetch('Roster.csv')
+fetch('Roster.csv', { cache: 'no-store' })
 .then(res => res.text())
 .then(text => {
   const rows = text.trim().split('\n').map(r => r.split(';').map(c => c.trim()));
   const table = document.getElementById('rosterTable');
-  const today = new Date().getDate().toString();
 
-  let html = '<thead><tr class="sticky-top">';
+  const today = new Date();
+  today.setHours(0,0,0,0);
 
-  rows[0].forEach((h,i)=>{
-    if(i===0) html+=`<th class="col-nik border">NIK</th>`;
-    else if(i===1) html+=`<th class="col-nama border">NAMA</th>`;
-    else html+=`<th class="border text-center ${h===today?'today-header':''}">${h}</th>`;
-  });
+  const endDate = new Date(today);
+  endDate.setDate(today.getDate() + 30);
 
-  html+='</tr></thead><tbody>';
-
-  rows.slice(1).forEach(row=>{
-    const sec=row[0]?.toUpperCase();
-    if(['KASIR','OPERASIONAL','BACK OFFICE'].includes(sec)){
-      html+=`<tr class="bg-slate-800 text-white">
-        <td colspan="${rows[0].length}" class="px-3 py-2 font-bold">${sec}</td></tr>`;
+  // Tentukan kolom yang ditampilkan
+  const visibleIdx = [];
+  rows[0].forEach((h, i) => {
+    if (i < 2) {
+      visibleIdx.push(i);
       return;
     }
-    html+='<tr>';
-    row.forEach((cell,i)=>{
-      let cls='border text-center';
-      if(i===0) cls+=' col-nik';
-      if(i===1) cls+=' col-nama';
-      if(i>1){
-        cls+=` shift-${cell.replace(/\s/g,'')}`;
-        if(rows[0][i]===today) cls+=' today-col';
-      }
-      html+=`<td class="${cls}">${cell}</td>`;
-    });
-    html+='</tr>';
+    const d = new Date(h);
+    if (!isNaN(d) && d >= today && d <= endDate) {
+      visibleIdx.push(i);
+    }
   });
 
-  html+='</tbody>';
-  table.innerHTML=html;
-});
-</script>
+  let html = '<thead><tr class="sticky-top">';
+  visibleIdx.forEach(i => {
+    if (i === 0) html += '<th class="col-nik border">NIK</th>';
+    else if (i === 1) html += '<th class="col-nama border">NAMA</th>';
+    else {
+      const d = new Date(rows[0][i]);
+      const isToday = d.getTime() === today.getTime();
+      html += `<th class="border text-center ${isToday ? 'today-header' : ''}">
+                ${d.getDate()}
+              </th>`;
+    }
+  });
+  html += '</tr></thead><tbody>';
 
-<script>
-fetch('Roster.csv',{cache:'no-store'}).then(res=>{
-  const lm=res.headers.get('Last-Modified');
-  document.getElementById('lastUpdated').innerText=
-    'Last updated: '+(lm?new Date(lm).toLocaleString('id-ID'):'baru saja');
-});
-</script>
+  rows.slice(1).forEach(row => {
+    const sec = row[0]?.toUpperCase();
+    if (['KASIR','OPERASIONAL','BACK OFFICE'].includes(sec)) {
+      html += `<tr class="bg-slate-800 text-white">
+        <td colspan="${visibleIdx.length}" class="px-3 py-2 font-bold">${sec}</td>
+      </tr>`;
+      return;
+    }
 
-<script>
-document.getElementById('downloadKasir').onclick=()=>{
-fetch('Roster.csv').then(r=>r.text()).then(t=>{
-const r=t.trim().split('\n').map(x=>x.split(';'));
-let out=[r[0].join(';')],ok=false;
-r.slice(1).forEach(x=>{
-const c=x[0]?.toUpperCase();
-if(c==='KASIR'){ok=true;return;}
-if(['OPERASIONAL','BACK OFFICE'].includes(c))ok=false;
-if(ok) out.push(x.join(';'));
+    html += '<tr>';
+    visibleIdx.forEach(i => {
+      let cls = 'border text-center';
+      if (i === 0) cls += ' col-nik';
+      if (i === 1) cls += ' col-nama';
+      if (i > 1) {
+        const d = new Date(rows[0][i]);
+        if (d.getTime() === today.getTime()) cls += ' today-col';
+        cls += ` shift-${(row[i] || '').replace(/\s/g,'')}`;
+      }
+      html += `<td class="${cls}">${row[i] || ''}</td>`;
+    });
+    html += '</tr>';
+  });
+
+  html += '</tbody>';
+  table.innerHTML = html;
 });
-const b=new Blob([out.join('\n')],{type:'text/csv'});
-const a=document.createElement('a');
-a.href=URL.createObjectURL(b);
-a.download='Roster_Kasir_2026.csv';
-a.click();
-});
-};
 </script>
 
 </body>
