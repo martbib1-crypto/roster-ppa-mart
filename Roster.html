@@ -107,7 +107,8 @@ th:not(.col-nik):not(.col-nama){
   <span class="shift-IND px-2 py-1 rounded">IND</span>
 </div>
 
-<div class="overflow-auto bg-white rounded shadow max-h-[80vh]">
+<!-- AREA ROSTER + PDF -->
+<div id="pdfArea" class="overflow-auto bg-white rounded shadow max-h-[80vh]">
   <div class="flex gap-4 mb-2 text-xs text-gray-600 px-1">
     <div>Periode: <b data-periode>memuat...</b></div>
     <div id="lastUpdated">Last updated: memuat...</div>
@@ -121,6 +122,11 @@ th:not(.col-nik):not(.col-nama){
       <button id="downloadKasir"
         class="px-3 py-1 rounded bg-blue-700 text-white">
         ⬇ CSV Kasir
+      </button>
+
+      <button id="downloadPDF"
+        class="px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700">
+        ⬇ PDF
       </button>
 
       <div class="flex flex-wrap gap-3 text-gray-700">
@@ -138,7 +144,10 @@ th:not(.col-nik):not(.col-nama){
   </div>
 </div>
 
-<!-- SCRIPT -->
+<!-- LIBRARY PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<!-- SCRIPT ROSTER -->
 <script>
 fetch('Roster.csv',{cache:'no-store'})
 .then(res=>{
@@ -181,7 +190,8 @@ fetch('Roster.csv',{cache:'no-store'})
   rows.slice(1).forEach(r=>{
     const sec=r[0]?.toUpperCase();
     if(['KASIR','OPERASIONAL','BACK OFFICE'].includes(sec)){
-      html+=`<tr class="bg-slate-800 text-white"><td colspan="${idx.length*2}" class="px-3 py-2 font-bold">${sec}</td></tr>`;
+      html+=`<tr class="bg-slate-800 text-white">
+        <td colspan="${idx.length*2}" class="px-3 py-2 font-bold">${sec}</td></tr>`;
       return;
     }
     html+='<tr>';lastM=null;
@@ -200,6 +210,20 @@ fetch('Roster.csv',{cache:'no-store'})
 
   document.getElementById('rosterTable').innerHTML=html+'</tbody>';
 });
+</script>
+
+<!-- SCRIPT PDF -->
+<script>
+document.getElementById('downloadPDF').onclick = () => {
+  const el = document.getElementById('pdfArea');
+  html2pdf().set({
+    margin: 5,
+    filename: 'Roster_PPA_Mart_2026.pdf',
+    image: { type: 'jpeg', quality: 0.95 },
+    html2canvas: { scale: 2, scrollY: 0 },
+    jsPDF: { unit: 'mm', format: 'a3', orientation: 'landscape' }
+  }).from(el).save();
+};
 </script>
 
 </body>
