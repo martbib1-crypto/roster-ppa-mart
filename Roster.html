@@ -104,26 +104,15 @@ th:not(.col-nik):not(.col-nama){
   <table id="rosterTable" class="border-collapse"></table>
 </div>
 
-<!-- GANTI HANYA BAGIAN SCRIPT + TOMBOL INI -->
-
-<div class="flex gap-2 mb-3">
-  <button onclick="downloadPage()"
-    class="px-3 py-1 text-xs rounded bg-green-700 text-white">
-    ⬇ Download Halaman (HTML)
-  </button>
-
-  <button id="downloadKasir"
-    class="px-3 py-1 text-xs rounded bg-blue-700 text-white">
-    ⬇ Download Kasir (CSV)
-  </button>
-</div>
-
 <script>
+// ===== FUNGSI DOWNLOAD HALAMAN =====
 function downloadPage() {
-  // clone seluruh body agar semua elemen ikut (termasuk keterangan jam)
-  const html = document.documentElement.outerHTML;
+  const clone = document.documentElement.cloneNode(true);
 
-  const blob = new Blob([html], {
+  // buang tombol saat disimpan
+  clone.querySelectorAll('button').forEach(b => b.remove());
+
+  const blob = new Blob([clone.outerHTML], {
     type: 'text/html;charset=utf-8'
   });
 
@@ -132,8 +121,71 @@ function downloadPage() {
   a.download = 'Roster_PPA_Mart.html';
   a.click();
 }
+
+// ===== SCRIPT ROSTER (ASLI) =====
+fetch('Roster.csv',{cache:'no-store'})
+.then(res=>{
+  const lm=res.headers.get('Last-Modified');
+  document.getElementById('lastUpdated').innerText =
+    'Last updated: '+(lm?new Date(lm).toLocaleString('id-ID'):'baru saja');
+  return res.text();
+})
+.then(text=>{
+  const rows=text.trim().split('\n').map(r=>r.split(';').map(c=>c.trim()));
+  const table=document.getElementById('rosterTable');
+
+  const today=new Date();today.setHours(0,0,0,0);
+  const end=new Date(today);end.setDate(today.getDate()+30);
+
+  const idx=[],dates=[];
+  rows[0].forEach((h,i)=>{
+    if(i<2){idx.push(i);return;}
+    const d=new Date(h);
+    if(!isNaN(d)&&d>=today&&d<=end){idx.push(i);dates.push(d);}
+  });
+
+  if(dates.length){
+    const b=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+    const s=dates[0],e=dates.at(-1);
+    document.querySelector('[data-periode]').innerText =
+      s.getMonth()===e.getMonth()?`${b[s.getMonth()]} ${s.getFullYear()}`
+      :`${b[s.getMonth()]}–${b[e.getMonth()]} ${e.getFullYear()}`;
+  }
+
+  let html='<thead><tr class="sticky-top">',lastM=null;
+  idx.forEach(i=>{
+    if(i===0){html+='<th class="col-nik border">NIK</th>';return;}
+    if(i===1){html+='<th class="col-nama border">NAMA</th>';return;}
+    const d=new Date(rows[0][i]);
+    if(lastM!==null&&d.getMonth()!==lastM)html+='<th class="month-separator"></th>';
+    html+=`<th class="border text-center ${d.getTime()===today.getTime()?'today-header':''}">${d.getDate()}</th>`;
+    lastM=d.getMonth();
+  });
+  html+='</tr></thead><tbody>';
+
+  rows.slice(1).forEach(r=>{
+    const sec=r[0]?.toUpperCase();
+    if(['KASIR','OPERASIONAL','BACK OFFICE'].includes(sec)){
+      html+=`<tr class="bg-slate-800 text-white"><td colspan="${idx.length*2}" class="px-3 py-2 font-bold">${sec}</td></tr>`;
+      return;
+    }
+    html+='<tr>';lastM=null;
+    idx.forEach(i=>{
+      if(i<2){
+        html+=`<td class="border ${i===0?'col-nik':'col-nama'}">${r[i]||''}</td>`;
+        return;
+      }
+      const d=new Date(rows[0][i]);
+      if(lastM!==null&&d.getMonth()!==lastM)html+='<td class="month-separator"></td>';
+      html+=`<td class="border text-center shift-${(r[i]||'').replace(/\s/g,'')} ${d.getTime()===today.getTime()?'today-col':''}">${r[i]||''}</td>`;
+      lastM=d.getMonth();
+    });
+    html+='</tr>';
+  });
+
+  table.innerHTML=html+'</tbody>';
+});
 </script>
 
 </body>
 </html>
-
