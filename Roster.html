@@ -75,7 +75,6 @@ th:not(.col-nik):not(.col-nama){
 
 <body class="p-4 text-xs" style="background:#f4f6f8">
 
-<!-- HEADER -->
 <div class="flex items-center gap-3 mb-3">
   <img src="Logo PPA Mart.png" class="h-14">
   <div>
@@ -84,22 +83,16 @@ th:not(.col-nik):not(.col-nama){
   </div>
 </div>
 
-<!-- LEGEND SHIFT -->
-<div class="flex flex-wrap gap-2 mb-2 text-xs">
-  <span class="shift-P px-2 py-1 rounded">P = Pagi</span>
-  <span class="shift-S px-2 py-1 rounded">S = Siang</span>
-  <span class="shift-M px-2 py-1 rounded">M = Middle</span>
-  <span class="shift-C px-2 py-1 rounded">C = Cuti</span>
-  <span class="shift-OFF px-2 py-1 rounded">OFF</span>
-  <span class="shift-STN px-2 py-1 rounded">STN</span>
-  <span class="shift-IND px-2 py-1 rounded">IND</span>
-</div>
+<div class="flex gap-2 mb-3">
+  <button onclick="downloadPage()"
+    class="px-3 py-1 text-xs rounded bg-green-700 text-white">
+    ⬇ Download Halaman (HTML)
+  </button>
 
-<!-- LEGEND KODE -->
-<div class="flex gap-4 mb-3 text-xs text-gray-700">
-  <span><b>MO</b> Main Office</span>
-  <span><b>MP</b> Manpower</span>
-  <span><b>OP</b> Office Plant</span>
+  <button id="downloadKasir"
+    class="px-3 py-1 text-xs rounded bg-blue-700 text-white">
+    ⬇ Download Kasir (CSV)
+  </button>
 </div>
 
 <div class="overflow-auto bg-white rounded shadow max-h-[80vh]">
@@ -109,31 +102,27 @@ th:not(.col-nik):not(.col-nama){
   </div>
 
   <table id="rosterTable" class="border-collapse"></table>
-
-  <button id="downloadKasir"
-    class="m-2 px-3 py-1 text-xs rounded bg-blue-700 text-white">
-    ⬇ Download Kasir (CSV)
-  </button>
-
-  <!-- KETERANGAN JAM -->
-  <div class="mt-3 border-t pt-2 text-xs text-gray-700 px-2">
-    <b>Keterangan Jam Kerja:</b>
-    <ul class="list-disc pl-5 mt-1 space-y-1">
-      <li>P : 05.00 – 16.00</li>
-      <li>P MP / OP : 06.00 – 17.00</li>
-      <li>P MO : 07.00 – 18.00</li>
-      <li>M : 08.00 – 19.00</li>
-      <li>M OP : 17.00 – 04.00</li>
-      <li>S : 11.00 – 22.00</li>
-      <li>S MP : 10.30 – 21.30</li>
-      <li>STN : 09.00 – 20.00</li>
-      <li>IND : 11.00 – 22.00</li>
-    </ul>
-  </div>
 </div>
 
-<!-- SCRIPT (tidak diubah dari versi stabil kamu) -->
 <script>
+// ===== FUNGSI DOWNLOAD HALAMAN =====
+function downloadPage() {
+  const clone = document.documentElement.cloneNode(true);
+
+  // buang tombol saat disimpan
+  clone.querySelectorAll('button').forEach(b => b.remove());
+
+  const blob = new Blob([clone.outerHTML], {
+    type: 'text/html;charset=utf-8'
+  });
+
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'Roster_PPA_Mart.html';
+  a.click();
+}
+
+// ===== SCRIPT ROSTER (ASLI) =====
 fetch('Roster.csv',{cache:'no-store'})
 .then(res=>{
   const lm=res.headers.get('Last-Modified');
