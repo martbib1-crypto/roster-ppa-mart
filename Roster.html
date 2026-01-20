@@ -70,17 +70,45 @@ th:not(.col-nik):not(.col-nama){
   border-left:2px solid #9ca3af;
   border-right:2px solid #9ca3af;
 }
+
+.action-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 50;
+  background: #ffffff;
+  border-top: 2px solid #e5e7eb;
+}
+
 </style>
 </head>
 
 <body class="p-4 text-xs" style="background:#f4f6f8">
 
 <!-- HEADER -->
-<div class="flex items-center gap-3 mb-3">
-  <img src="Logo PPA Mart.png" class="h-14">
-  <div>
-    <h1 class="text-xl font-bold">Roster PPA Mart 2026</h1>
-    <div class="text-xs text-gray-500">Koperasi Karyawan PPA Sejahtera</div>
+<<!-- ACTION BAR (FREEZE) -->
+<div class="action-bar mt-2 p-2 text-xs">
+  <div class="flex flex-wrap items-center gap-3">
+    <button id="downloadKasir"
+      class="px-3 py-1 rounded bg-blue-700 text-white">
+      ⬇ CSV Kasir
+    </button>
+
+    <button id="downloadPDF"
+      class="px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700">
+      ⬇ PDF
+    </button>
+
+    <div class="flex flex-wrap gap-3 text-gray-700 ml-2">
+      <span><b>P</b> 05.00–16.00</span>
+      <span><b>P MP/OP</b> 06.00–17.00</span>
+      <span><b>P MO</b> 07.00–18.00</span>
+      <span><b>M</b> 08.00–19.00</span>
+      <span><b>M OP</b> 17.00–04.00</span>
+      <span><b>S</b> 11.00–22.00</span>
+      <span><b>S MP</b> 10.30–21.30</span>
+      <span><b>STN</b> 09.00–20.00</span>
+      <span><b>IND</b> 11.00–22.00</span>
+    </div>
   </div>
 </div>
 
@@ -227,4 +255,5 @@ document.getElementById('downloadPDF').onclick = () => {
 
 </body>
 </html>
+
 
