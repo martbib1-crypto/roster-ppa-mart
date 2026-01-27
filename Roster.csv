@@ -1,5 +1,5 @@
 NIK;NAMA;19-Jan-26;20-Jan-26;21-Jan-26;22-Jan-26;23-Jan-26;24-Jan-26;25-Jan-26;26-Jan-26;27-Jan-26;28-Jan-26;29-Jan-26;30-Jan-26;31-Jan-26;01-Feb-26;02-Feb-26;03-Feb-26;04-Feb-26;05-Feb-26;06-Feb-26;07-Feb-26;08-Feb-26;09-Feb-26;10-Feb-26;11-Feb-26;12-Feb-26;13-Feb-26;14-Feb-26;15-Feb-26;16-Feb-26;17-Feb-26;18-Feb-26;19-Feb-26;20-Feb-26;21-Feb-26;22-Feb-26;23-Feb-26;24-Feb-26;25-Feb-26;26-Feb-26;27-Feb-26;28-Feb-26
-;;Sen;Sel;Rab;Kam;Jum;Sab;Mgg;Sen;Sel;Rab;Kam;Jum;Sab;Mgg;Sen;Sel;Rab;Kam;Jum;Sab;Mgg;Sen;Sel;Rab;Kam;Jum;Sab;Mgg;Sen;Sel;Kam;Jum;Sab;Mgg;Sen;Sel;Kam;Jum;Sab;Mgg;Sen
+;;Sen;Sel;Rab;Kam;Jum;Sab;Mgg;Sen;Sel;Rab;Kam;Jum;Sab;Mgg;Sen;Sel;Rab;Kam;Jum;Sab;Mgg;Sen;Sel;Rab;Kam;Jum;Sab;Mgg;Sen;Sel;Rab;Kam;Jum;Sab;Mgg;Sen;Sel;Rab;Kam;Jum;Sab
 KASIR;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 DA-221034;RINI ANGGRAINI;P MO;P;OFF;S;S;S;M;P MO;P MO;S;S;S;S;P MO;P MO;P MO;P;OFF;S;S;S;S;P MO;P MO;P MO;S;S;P MO;P MO;P;OFF;S;M;P;C;C;C;C;C;C;C
 DA-230311;RANI PURWANINGSIH;P;P MO;P;OFF;S;P MO;P MO;P;C;C;C;C;C;C;C;C;C;C;C;C;C;C;C;C;C;IND;S;S;S;P MO;P MO;P MO;S;M;P;P;OFF;S;S;P MO;P MO
@@ -23,9 +23,7 @@ DA-211031;AHMAD AFANDI;STN;STN;STN;P;OFF;S;M;M;P;P MP;P MP;STN;STN;STN;STN;STN;S
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 BACK OFFICE;BACK OFFICE;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 DA-210405;EDI SUGANDA;M;M;M;M;M;M;M;M;M;M;M;M;P;OFF;M;M;M;M;M;M;M;M;M;M;M;M;P;OFF;M;M;M;M;M;M;M;M;M;M;M;P;C
-DA-211246;SUCI ULANDARI;M;M;M;M;M;M;P;OFF;M;M;M;M;M;M;M;M;M;M;M;M;P;OFF;M;M;M;M;M;M;M;M;M;M;M;M;P;OFF;M;M;M;M;M
-DA-210409;ERRI PRIADANA;C;C;C;C;C;IND;M;M;M;M;M;M;M;M;M;M;M;P;OFF;M;M;M;M;M;M;M;M;M;M;M;M;P;OFF;M;M;M;M;M;M;M;M
+DA-211246;SUCI ULANDARI;M;M;M;M;M;M;P;OFF;M;M;M;M;M;M;M;M;M;M;P;OFF;M;M;M;M;M;M;M;M;M;M;M;M;P;OFF;M;M;M;M;M;M;M
+DA-210409;ERRI PRIADANA;C;C;C;C;C;IND;M;M;M;M;M;M;M;M;M;P;OFF;M;M;M;M;M;M;M;M;M;M;M;M;P;OFF;M;M;M;M;M;M;M;M;M;M
 DA-220160;MUSRIPATUL;M;P;OFF;M;M;M;M;M;M;M;M;M;M;M;M;P;OFF;M;P;C;C;C;C;C;C;C;C;C;C;C;C;C;C;C;C;C;IND;M;M;M;M
 DA-210501;MUHAMMAD RIZAL;M;M;M;M;M;P;C;C;C;C;C;C;C;C;C;C;C;C;C;C;C;C;C;IND;M;M;M;M;M;M;M;M;M;M;M;P;OFF;M;M;M;M
-
-
