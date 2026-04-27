@@ -119,17 +119,35 @@ th:not(.col-nik):not(.col-nama){
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <script>
-// 🔥 FIX PARSE TANGGAL
+// ✅ PARSE TANGGAL SUPPORT BULAN INDONESIA
 function parseTanggal(str){
   str = str.trim();
 
-  if(str.includes('/')){
-    const [d,m,y] = str.split('/');
-    return new Date(`${y}-${m}-${d}`);
+  const bulan = {
+    jan:0, feb:1, mar:2, apr:3, mei:4, jun:5,
+    jul:6, agu:7, sep:8, okt:9, nov:10, des:11
+  };
+
+  if(str.includes('-')){
+    const parts = str.split('-');
+
+    if(parts.length === 3){
+      let d = parseInt(parts[0]);
+      let m = parts[1].toLowerCase();
+      let y = parseInt(parts[2]);
+
+      if(isNaN(m)){
+        if(bulan[m] !== undefined){
+          return new Date(2000 + y, bulan[m], d);
+        }
+      }
+
+      return new Date(str);
+    }
   }
 
-  if(str.includes('-') && str.split('-')[0].length === 2){
-    const [d,m,y] = str.split('-');
+  if(str.includes('/')){
+    const [d,m,y] = str.split('/');
     return new Date(`${y}-${m}-${d}`);
   }
 
@@ -148,7 +166,7 @@ fetch('Roster.csv',{cache:'no-store'})
 
   const today=new Date();today.setHours(0,0,0,0);
   const end=new Date(today);
-  end.setDate(today.getDate()+31); // ✅ 31 hari
+  end.setDate(today.getDate()+31);
 
   const idx=[],dates=[];
 
@@ -194,7 +212,8 @@ fetch('Roster.csv',{cache:'no-store'})
 
   html+='</tr></thead><tbody>';
 
-  rows.slice(1).forEach(r=>{
+  // ✅ SKIP BARIS KE-2 (HARI)
+  rows.slice(2).forEach(r=>{
     const sec=r[0]?.toUpperCase();
 
     if(['KASIR','OPERASIONAL','BACK OFFICE'].includes(sec)){
