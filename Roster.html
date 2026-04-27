@@ -216,270 +216,128 @@
   <!-- LIBRARY PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-  <script>
-    const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+<script>
+fetch('Roster.csv',{cache:'no-store'})
+.then(res=>{
+  const lm=res.headers.get('Last-Modified');
+  document.getElementById('lastUpdated').innerText =
+    'Last updated: '+(lm?new Date(lm).toLocaleString('id-ID'):'baru saja');
+  return res.text();
+})
+.then(text=>{
+  const rows=text.trim().split('\n').map(r=>r.split(';').map(c=>c.trim()));
 
-    function parseDateSafe(value) {
-      if (!value) return null;
-      const v = String(value).trim();
+  // ===== FIX TANGGAL =====
+  const today = new Date();
+  today.setHours(0,0,0,0);
 
-      if (/^\d{4}-\d{2}-\d{2}$/.test(v)) {
-        const [y, m, d] = v.split('-').map(Number);
-        return new Date(y, m - 1, d);
-      }
+  // 31 hari (hari ini + 30 hari ke depan)
+  const end = new Date(today.getTime() + (30 * 24 * 60 * 60 * 1000));
 
-      if (/^\d{2}\/\d{2}\/\d{4}$/.test(v)) {
-        const [d, m, y] = v.split('/').map(Number);
-        return new Date(y, m - 1, d);
-      }
+  const idx=[],dates=[];
 
-      if (/^\d{2}-\d{2}-\d{4}$/.test(v)) {
-        const [d, m, y] = v.split('-').map(Number);
-        return new Date(y, m - 1, d);
-      }
+  rows[0].forEach((h,i)=>{
+    if(i<2){idx.push(i);return;}
 
-      const d = new Date(v);
-      return isNaN(d) ? null : new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    // ===== PARSE TANGGAL LEBIH AMAN =====
+    let d = new Date(h);
+
+    // fallback kalau format DD/MM/YYYY
+    if(isNaN(d) && h.includes('/')){
+      const [dd,mm,yy] = h.split('/');
+      d = new Date(`${yy}-${mm}-${dd}`);
     }
 
-    function escapeHtml(text) {
-      return String(text ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
+    // paksa tanpa timezone geser
+    if(!isNaN(d)){
+      d = new Date(d.toISOString().split('T')[0]);
     }
 
-    function getShiftClass(value) {
-      const key = String(value || '').trim().toUpperCase().replace(/\s+/g, '');
+    if(!isNaN(d) && d>=today && d<=end){
+      idx.push(i);
+      dates.push(d);
+    }
+  });
 
-      const map = {
-        'P': 'shift-P',
-        'S': 'shift-S',
-        'M': 'shift-M',
-        'C': 'shift-C',
-        'OFF': 'shift-OFF',
-        'STN': 'shift-STN',
-        'IND': 'shift-IND',
-        'PMO': 'shift-PMO',
-        'POP': 'shift-POP',
-        'PMP': 'shift-PMP',
-        'SMP': 'shift-SMP',
-        'MOP': 'shift-MOP'
-      };
+  // ===== PERIODE =====
+  if(dates.length){
+    const b=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+    const s=dates[0],e=dates.at(-1);
 
-      return map[key] || 'shift-default';
+    document.querySelector('[data-periode]').innerText =
+      s.getMonth()===e.getMonth()
+      ? `${b[s.getMonth()]} ${s.getFullYear()}`
+      : `${b[s.getMonth()]}–${b[e.getMonth()]} ${e.getFullYear()}`;
+  }
+
+  // ===== HEADER =====
+  let html='<thead><tr class="sticky-top">',lastM=null;
+
+  idx.forEach(i=>{
+    if(i===0){html+='<th class="col-nik border">NIK</th>';return;}
+    if(i===1){html+='<th class="col-nama border">NAMA</th>';return;}
+
+    let d = new Date(rows[0][i]);
+    if(isNaN(d) && rows[0][i].includes('/')){
+      const [dd,mm,yy] = rows[0][i].split('/');
+      d = new Date(`${yy}-${mm}-${dd}`);
     }
 
-    function buildRoster(csvText) {
-      const table = document.getElementById('rosterTable');
-      const rows = csvText
-        .trim()
-        .split(/\r?\n/)
-        .map(r => r.split(';').map(c => c.trim()));
+    if(lastM!==null && d.getMonth()!==lastM){
+      html+='<th class="month-separator"></th>';
+    }
 
-      if (!rows.length || rows[0].length < 3) {
-        table.innerHTML = '<tr><td class="p-4 text-red-600">Format CSV tidak valid.</td></tr>';
+    html+=`<th class="border text-center ${d.getTime()===today.getTime()?'today-header':''}">
+      ${d.getDate()}
+    </th>`;
+
+    lastM=d.getMonth();
+  });
+
+  html+='</tr></thead><tbody>';
+
+  // ===== BODY =====
+  rows.slice(1).forEach(r=>{
+    const sec=r[0]?.toUpperCase();
+
+    if(['KASIR','OPERASIONAL','BACK OFFICE'].includes(sec)){
+      html+=`<tr class="bg-slate-800 text-white">
+        <td colspan="${idx.length*2}" class="px-3 py-2 font-bold">${sec}</td></tr>`;
+      return;
+    }
+
+    html+='<tr>';
+    lastM=null;
+
+    idx.forEach(i=>{
+      if(i<2){
+        html+=`<td class="border ${i===0?'col-nik':'col-nama'}">${r[i]||''}</td>`;
         return;
       }
 
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      const end = new Date(today);
-      end.setDate(today.getDate() + 30);
-
-      const rawHeader = rows[0];
-      const selectedCols = [
-        { type: 'nik', index: 0 },
-        { type: 'nama', index: 1 }
-      ];
-
-      const visibleDates = [];
-      let lastMonth = null;
-
-      for (let i = 2; i < rawHeader.length; i++) {
-        const d = parseDateSafe(rawHeader[i]);
-        if (!d) continue;
-        if (d >= today && d <= end) {
-          if (lastMonth !== null && d.getMonth() !== lastMonth) {
-            selectedCols.push({ type: 'separator' });
-          }
-          selectedCols.push({ type: 'date', index: i, date: d });
-          visibleDates.push(d);
-          lastMonth = d.getMonth();
-        }
+      let d = new Date(rows[0][i]);
+      if(isNaN(d) && rows[0][i].includes('/')){
+        const [dd,mm,yy] = rows[0][i].split('/');
+        d = new Date(`${yy}-${mm}-${dd}`);
       }
 
-      if (!visibleDates.length) {
-        table.innerHTML = '<tr><td class="p-4 text-red-600">Tidak ada tanggal yang cocok untuk 30 hari ke depan.</td></tr>';
-        return;
+      if(lastM!==null && d.getMonth()!==lastM){
+        html+='<td class="month-separator"></td>';
       }
 
-      const startDate = visibleDates[0];
-      const endDate = visibleDates[visibleDates.length - 1];
+      html+=`<td class="border text-center shift-${(r[i]||'').replace(/\s/g,'')}
+        ${d.getTime()===today.getTime()?'today-col':''}">
+        ${r[i]||''}
+      </td>`;
 
-      document.querySelector('[data-periode]').innerText =
-        startDate.getMonth() === endDate.getMonth() && startDate.getFullYear() === endDate.getFullYear()
-          ? `${MONTH_NAMES[startDate.getMonth()]} ${startDate.getFullYear()}`
-          : startDate.getFullYear() === endDate.getFullYear()
-            ? `${MONTH_NAMES[startDate.getMonth()]}–${MONTH_NAMES[endDate.getMonth()]} ${endDate.getFullYear()}`
-            : `${MONTH_NAMES[startDate.getMonth()]} ${startDate.getFullYear()} – ${MONTH_NAMES[endDate.getMonth()]} ${endDate.getFullYear()}`;
+      lastM=d.getMonth();
+    });
 
-      let html = '<thead>';
-      html += '<tr class="sticky-top">';
+    html+='</tr>';
+  });
 
-      selectedCols.forEach(col => {
-        if (col.type === 'nik') {
-          html += '<th class="col-nik border px-2 py-2">NIK</th>';
-        } else if (col.type === 'nama') {
-          html += '<th class="col-nama border px-2 py-2">NAMA</th>';
-        } else if (col.type === 'separator') {
-          html += '<th class="month-separator"></th>';
-        } else if (col.type === 'date') {
-          const isToday = col.date.getTime() === today.getTime();
-          html += `<th class="border px-2 py-2 shift-cell ${isToday ? 'today-header' : ''}">${col.date.getDate()}</th>`;
-        }
-      });
-
-      html += '</tr></thead><tbody>';
-
-      rows.slice(1).forEach(r => {
-        const firstCell = (r[0] || '').trim().toUpperCase();
-
-        if (['KASIR', 'OPERASIONAL', 'BACK OFFICE'].includes(firstCell)) {
-          html += `
-            <tr class="section-row">
-              <td colspan="${selectedCols.length}">${escapeHtml(firstCell)}</td>
-            </tr>
-          `;
-          return;
-        }
-
-        html += '<tr>';
-
-        selectedCols.forEach(col => {
-          if (col.type === 'nik') {
-            html += `<td class="border col-nik px-2 py-1">${escapeHtml(r[0] || '')}</td>`;
-          } else if (col.type === 'nama') {
-            html += `<td class="border col-nama px-2 py-1">${escapeHtml(r[1] || '')}</td>`;
-          } else if (col.type === 'separator') {
-            html += '<td class="month-separator"></td>';
-          } else if (col.type === 'date') {
-            const value = (r[col.index] || '').trim();
-            const cls = getShiftClass(value);
-            const isToday = col.date.getTime() === today.getTime();
-
-            html += `
-              <td class="border px-2 py-1 shift-cell ${cls} ${isToday ? 'today-col' : ''}">
-                ${escapeHtml(value)}
-              </td>
-            `;
-          }
-        });
-
-        html += '</tr>';
-      });
-
-      html += '</tbody>';
-      table.innerHTML = html;
-    }
-
-    fetch('Roster.csv', { cache: 'no-store' })
-      .then(res => {
-        if (!res.ok) {
-          throw new Error('Gagal mengambil file Roster.csv');
-        }
-
-        const lm = res.headers.get('Last-Modified');
-        document.getElementById('lastUpdated').innerText =
-          'Last updated: ' + (lm ? new Date(lm).toLocaleString('id-ID') : 'baru saja');
-
-        return res.text();
-      })
-      .then(buildRoster)
-      .catch(err => {
-        document.getElementById('lastUpdated').innerText = 'Last updated: gagal dimuat';
-        document.getElementById('rosterTable').innerHTML = `
-          <tr>
-            <td class="p-4 text-red-600 border">
-              Gagal memuat roster: ${escapeHtml(err.message)}
-            </td>
-          </tr>
-        `;
-      });
-
-    document.getElementById('downloadPDF').onclick = () => {
-      const source = document.getElementById('pdfArea');
-      const clone = source.cloneNode(true);
-
-      clone.style.maxHeight = 'none';
-      clone.style.overflow = 'visible';
-      clone.style.background = '#ffffff';
-      clone.style.width = 'max-content';
-
-      const scrollBox = clone.querySelector('.overflow-auto');
-      if (scrollBox) {
-        scrollBox.style.maxHeight = 'none';
-        scrollBox.style.overflow = 'visible';
-      }
-
-      const actionBar = clone.querySelector('.action-bar');
-      if (actionBar) {
-        actionBar.style.position = 'static';
-      }
-
-      const infoSticky = clone.querySelector('.info-sticky');
-      if (infoSticky) {
-        infoSticky.style.position = 'static';
-      }
-
-      clone.style.padding = '10px';
-
-      const wrapper = document.createElement('div');
-      wrapper.style.background = '#ffffff';
-      wrapper.style.padding = '10px';
-      wrapper.appendChild(clone);
-
-      html2pdf().set({
-        margin: 5,
-        filename: 'Roster_PPA_Mart_2026.pdf',
-        image: { type: 'jpeg', quality: 0.95 },
-        html2canvas: {
-          scale: 2,
-          scrollY: 0,
-          useCORS: true
-        },
-        jsPDF: {
-          unit: 'mm',
-          format: 'a3',
-          orientation: 'landscape'
-        },
-        pagebreak: { mode: ['css', 'legacy'] }
-      }).from(wrapper).save();
-    };
-
-    document.getElementById('downloadKasir').onclick = () => {
-      fetch('Roster.csv', { cache: 'no-store' })
-        .then(res => {
-          if (!res.ok) throw new Error('Gagal mengambil CSV');
-          return res.blob();
-        })
-        .then(blob => {
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = 'Roster.csv';
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          URL.revokeObjectURL(url);
-        })
-        .catch(err => {
-          alert('Gagal download CSV: ' + err.message);
-        });
-    };
-  </script>
+  document.getElementById('rosterTable').innerHTML = html+'</tbody>';
+});
+</script>
 </body>
 </html>
