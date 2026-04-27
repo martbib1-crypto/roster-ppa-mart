@@ -13,6 +13,7 @@
 
 th, td { white-space: nowrap; }
 
+/* HEADER & LEFT STICKY */
 .sticky-top {
   position: sticky;
   top: 0;
@@ -52,16 +53,19 @@ th, td { white-space: nowrap; }
 .shift-SMP{background:#7c3aed;color:#fff;border:1px solid #222}
 .shift-MOP{background:#fff;color:#000;border:1px solid #222}
 
+/* TODAY */
 .today-header,.today-col{
   border-left:3px solid #dc2626!important;
   border-right:3px solid #dc2626!important;
 }
 
+/* WIDTH */
 td:not(.col-nik):not(.col-nama),
 th:not(.col-nik):not(.col-nama){
   width:44px;min-width:44px;max-width:44px;
 }
 
+/* MONTH SEPARATOR */
 .month-separator{
   width:8px;min-width:8px;
   background:repeating-linear-gradient(
@@ -70,6 +74,7 @@ th:not(.col-nik):not(.col-nama){
   border-right:2px solid #9ca3af;
 }
 
+/* ACTION BAR */
 .action-bar{
   position: sticky;
   bottom: 0;
@@ -82,6 +87,7 @@ th:not(.col-nik):not(.col-nama){
 
 <body class="p-4 text-xs" style="background:#f4f6f8">
 
+<!-- HEADER -->
 <div class="flex items-center gap-3 mb-3">
   <img src="Logo PPA Mart.png" class="h-14">
   <div>
@@ -90,6 +96,7 @@ th:not(.col-nik):not(.col-nama){
   </div>
 </div>
 
+<!-- LEGEND -->
 <div class="flex flex-wrap gap-2 mb-3 text-xs">
   <span class="shift-P px-2 py-1 rounded">P</span>
   <span class="shift-S px-2 py-1 rounded">S</span>
@@ -100,6 +107,7 @@ th:not(.col-nik):not(.col-nama){
   <span class="shift-IND px-2 py-1 rounded">IND</span>
 </div>
 
+<!-- AREA ROSTER + PDF -->
 <div id="pdfArea" class="overflow-auto bg-white rounded shadow max-h-[80vh]">
   <div class="flex gap-4 mb-2 text-xs text-gray-600 px-1">
     <div>Periode: <b data-periode>memuat...</b></div>
@@ -108,50 +116,94 @@ th:not(.col-nik):not(.col-nama){
 
   <table id="rosterTable" class="border-collapse"></table>
 
+  <!-- ACTION BAR -->
   <div class="action-bar p-2 text-xs">
-    <button id="downloadPDF"
-      class="px-3 py-1 rounded bg-red-600 text-white">
-      ⬇ PDF
-    </button>
+    <div class="flex flex-wrap items-center gap-3">
+      <button id="downloadKasir"
+        class="px-3 py-1 rounded bg-blue-700 text-white">
+        ⬇ CSV Kasir
+      </button>
+
+      <button id="downloadPDF"
+        class="px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700">
+        ⬇ PDF
+      </button>
+
+      <div class="flex flex-wrap gap-3 text-gray-700">
+        <span><b>P</b> 05–16</span>
+        <span><b>P MP/OP</b> 06–17</span>
+        <span><b>P MO</b> 07–18</span>
+        <span><b>M</b> 08–19</span>
+        <span><b>M OP</b> 17–04</span>
+        <span><b>S</b> 11–22</span>
+        <span><b>S MP</b> 10.30–21.30</span>
+        <span><b>STN</b> 09–20</span>
+        <span><b>IND</b> 08–19</span>
+      </div>
+    </div>
   </div>
 </div>
 
+<!-- LIBRARY PDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
+<!-- SCRIPT ROSTER -->
 <script>
-// ✅ PARSE TANGGAL SUPPORT BULAN INDONESIA
-function parseTanggal(str){
-  str = str.trim();
+function detectDelimiter(text){
+  const first = text.split(/\r?\n/)[0] || '';
+  const tabs = (first.match(/\t/g)||[]).length;
+  const semis = (first.match(/;/g)||[]).length;
+  const commas = (first.match(/,/g)||[]).length;
+  if(tabs >= semis && tabs >= commas) return '\t';
+  if(semis >= commas) return ';';
+  return ',';
+}
 
+function parseCSV(text){
+  const delimiter = detectDelimiter(text);
+  return text.trim().split(/\r?\n/).map(r => r.split(delimiter).map(c => c.trim()));
+}
+
+function parseRosterDate(value){
+  if(!value) return null;
   const bulan = {
-    jan:0, feb:1, mar:2, apr:3, mei:4, jun:5,
-    jul:6, agu:7, sep:8, okt:9, nov:10, des:11
+    jan:0, januari:0,
+    feb:1, februari:1,
+    mar:2, maret:2,
+    apr:3, april:3,
+    mei:4, may:4,
+    jun:5, juni:5,
+    jul:6, juli:6,
+    agu:7, ags:7, aug:7, agustus:7,
+    sep:8, september:8,
+    okt:9, oct:9, oktober:9,
+    nov:10, november:10,
+    des:11, dec:11, desember:11
   };
 
-  if(str.includes('-')){
-    const parts = str.split('-');
-
-    if(parts.length === 3){
-      let d = parseInt(parts[0]);
-      let m = parts[1].toLowerCase();
-      let y = parseInt(parts[2]);
-
-      if(isNaN(m)){
-        if(bulan[m] !== undefined){
-          return new Date(2000 + y, bulan[m], d);
-        }
-      }
-
-      return new Date(str);
-    }
+  const s = String(value).trim();
+  let m = s.match(/^(\d{1,2})[-\/\s]([A-Za-zÀ-ÿ]+)[-\/\s](\d{2,4})$/);
+  if(m){
+    const day = Number(m[1]);
+    const mon = bulan[m[2].toLowerCase()];
+    let year = Number(m[3]);
+    if(year < 100) year += 2000;
+    if(mon !== undefined) return new Date(year, mon, day);
   }
 
-  if(str.includes('/')){
-    const [d,m,y] = str.split('/');
-    return new Date(`${y}-${m}-${d}`);
+  m = s.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{2,4})$/);
+  if(m){
+    let year = Number(m[3]);
+    if(year < 100) year += 2000;
+    return new Date(year, Number(m[2])-1, Number(m[1]));
   }
 
-  return new Date(str);
+  const d = new Date(s);
+  return isNaN(d) ? null : d;
+}
+
+function normalizeShift(value){
+  return String(value || '').trim().replace(/\s/g,'');
 }
 
 fetch('Roster.csv',{cache:'no-store'})
@@ -162,20 +214,20 @@ fetch('Roster.csv',{cache:'no-store'})
   return res.text();
 })
 .then(text=>{
-  const rows=text.trim().split('\n').map(r=>r.split(';').map(c=>c.trim()));
+  const rows = parseCSV(text);
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const end = new Date(today);
+  end.setDate(today.getDate()+30);
 
-  const today=new Date();today.setHours(0,0,0,0);
-  const end=new Date(today);
-  end.setDate(today.getDate()+31);
+  const header = rows[0] || [];
+  const idx = [];
+  const dates = [];
 
-  const idx=[],dates=[];
-
-  rows[0].forEach((h,i)=>{
-    if(i<2){idx.push(i);return;}
-
-    const d=parseTanggal(h);
-
-    if(!isNaN(d) && d>=today && d<=end){
+  header.forEach((h,i)=>{
+    if(i < 2){ idx.push(i); return; }
+    const d = parseRosterDate(h);
+    if(d && d >= today && d <= end){
       idx.push(i);
       dates.push(d);
     }
@@ -183,75 +235,76 @@ fetch('Roster.csv',{cache:'no-store'})
 
   if(dates.length){
     const b=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
-    const s=dates[0],e=dates.at(-1);
-
+    const s=dates[0], e=dates[dates.length-1];
     document.querySelector('[data-periode]').innerText =
-      s.getMonth()===e.getMonth()
+      s.getMonth()===e.getMonth() && s.getFullYear()===e.getFullYear()
       ? `${b[s.getMonth()]} ${s.getFullYear()}`
-      : `${b[s.getMonth()]}–${b[e.getMonth()]} ${e.getFullYear()}`;
+      : `${b[s.getMonth()]} ${s.getFullYear()}–${b[e.getMonth()]} ${e.getFullYear()}`;
+  } else {
+    document.querySelector('[data-periode]').innerText = 'tanggal tidak terbaca';
   }
 
-  let html='<thead><tr class="sticky-top">';
-  let lastM=null;
-
+  let html = '<thead>';
+  html += '<tr class="sticky-top">';
+  let lastM = null;
   idx.forEach(i=>{
-    if(i===0){html+='<th class="col-nik border">NIK</th>';return;}
-    if(i===1){html+='<th class="col-nama border">NAMA</th>';return;}
-
-    const d=parseTanggal(rows[0][i]);
-
-    if(lastM!==null && d.getMonth()!==lastM)
-      html+='<th class="month-separator"></th>';
-
-    html+=`<th class="border text-center ${d.getTime()===today.getTime()?'today-header':''}">
-      ${d.getDate()}
-    </th>`;
-
-    lastM=d.getMonth();
+    if(i===0){ html += '<th class="col-nik border" rowspan="2">NIK</th>'; return; }
+    if(i===1){ html += '<th class="col-nama border" rowspan="2">NAMA</th>'; return; }
+    const d = parseRosterDate(header[i]);
+    if(lastM !== null && d.getMonth() !== lastM) html += '<th class="month-separator" rowspan="2"></th>';
+    html += `<th class="border text-center ${d.getTime()===today.getTime()?'today-header':''}">${d.getDate()}</th>`;
+    lastM = d.getMonth();
   });
+  html += '</tr>';
 
-  html+='</tr></thead><tbody>';
+  html += '<tr class="sticky-top">';
+  lastM = null;
+  idx.forEach(i=>{
+    if(i < 2) return;
+    const d = parseRosterDate(header[i]);
+    if(lastM !== null && d.getMonth() !== lastM) html += '';
+    const hari = (rows[1] && rows[1][i]) ? rows[1][i] : '';
+    html += `<th class="border text-center text-[10px] text-gray-600 ${d.getTime()===today.getTime()?'today-header':''}">${hari}</th>`;
+    lastM = d.getMonth();
+  });
+  html += '</tr></thead><tbody>';
 
-  // ✅ SKIP BARIS KE-2 (HARI)
   rows.slice(2).forEach(r=>{
-    const sec=r[0]?.toUpperCase();
-
+    const sec = (r[0] || '').trim().toUpperCase();
     if(['KASIR','OPERASIONAL','BACK OFFICE'].includes(sec)){
-      html+=`<tr class="bg-slate-800 text-white">
-        <td colspan="${idx.length*2}" class="px-3 py-2 font-bold">${sec}</td>
-      </tr>`;
+      html += `<tr class="bg-slate-800 text-white">
+        <td colspan="999" class="px-3 py-2 font-bold text-left">${sec}</td></tr>`;
       return;
     }
 
-    html+='<tr>';
-    lastM=null;
+    if(!r[0] && !r[1]) return;
 
+    html += '<tr>';
+    lastM = null;
     idx.forEach(i=>{
-      if(i<2){
-        html+=`<td class="border ${i===0?'col-nik':'col-nama'}">${r[i]||''}</td>`;
+      if(i < 2){
+        html += `<td class="border ${i===0?'col-nik':'col-nama'}">${r[i] || ''}</td>`;
         return;
       }
-
-      const d=parseTanggal(rows[0][i]);
-
-      if(lastM!==null && d.getMonth()!==lastM)
-        html+='<td class="month-separator"></td>';
-
-      html+=`<td class="border text-center shift-${(r[i]||'').replace(/\s/g,'')}
-        ${d.getTime()===today.getTime()?'today-col':''}">
-        ${r[i]||''}
-      </td>`;
-
-      lastM=d.getMonth();
+      const d = parseRosterDate(header[i]);
+      if(lastM !== null && d.getMonth() !== lastM) html += '<td class="month-separator"></td>';
+      const shift = normalizeShift(r[i]);
+      html += `<td class="border text-center shift-${shift} ${d.getTime()===today.getTime()?'today-col':''}">${r[i] || ''}</td>`;
+      lastM = d.getMonth();
     });
-
-    html+='</tr>';
+    html += '</tr>';
   });
 
-  document.getElementById('rosterTable').innerHTML=html+'</tbody>';
+  document.getElementById('rosterTable').innerHTML = html + '</tbody>';
+})
+.catch(err=>{
+  document.querySelector('[data-periode]').innerText = 'gagal memuat';
+  document.getElementById('rosterTable').innerHTML = `<tbody><tr><td class="p-4 text-red-600">Gagal membaca Roster.csv: ${err.message}</td></tr></tbody>`;
 });
+</script>
 
-// PDF
+<!-- SCRIPT PDF -->
+<script>
 document.getElementById('downloadPDF').onclick = () => {
   const el = document.getElementById('pdfArea');
   html2pdf().set({
