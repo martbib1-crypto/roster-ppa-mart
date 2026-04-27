@@ -27,16 +27,16 @@ th, td { white-space: nowrap; }
   z-index: 60;
   background: #f9fafb;
   text-align: center;
-  min-width: 80px;
+  min-width: 105px;
 }
 
 .col-nama {
   position: sticky;
-  left: 80px;
+  left: 105px;
   z-index: 60;
   background: #fbf9f9;
   font-weight: 600;
-  min-width: 160px;
+  min-width: 190px;
   text-align: left;
   padding-left: 8px;
 }
@@ -208,6 +208,10 @@ function normalizeShift(value){
   return String(value || '').trim().replace(/\s/g,'');
 }
 
+function looksLikeNik(value){
+  return /^[A-Z]{1,4}[-\/ ]?\d{3,}$/i.test(String(value || '').trim());
+}
+
 fetch('Roster.csv',{cache:'no-store'})
 .then(res=>{
   const lm=res.headers.get('Last-Modified');
@@ -223,14 +227,27 @@ fetch('Roster.csv',{cache:'no-store'})
   end.setDate(today.getDate()+30);
 
   const header = rows[0] || [];
-  const idx = [];
-  const dates = [];
 
+  // Cari kolom tanggal pertama. Ini bikin NIK/NAMA tidak geser walau CSV berubah format.
+  const firstDateIndex = header.findIndex(h => parseRosterDate(h));
+  const identityHeaders = header.slice(0, firstDateIndex).map(h => String(h || '').trim().toUpperCase());
+
+  let nikIndex = identityHeaders.findIndex(h => h === 'NIK' || h.includes('NIK'));
+  let namaIndex = identityHeaders.findIndex(h => h === 'NAMA' || h.includes('NAMA'));
+
+  // Fallback: kalau header kacau tapi data kolom pertama mirip NIK, pakai kolom 0 sebagai NIK dan kolom 1 sebagai nama.
+  if(nikIndex < 0 && rows[2] && looksLikeNik(rows[2][0])) nikIndex = 0;
+  if(namaIndex < 0){
+    if(nikIndex === 0 && firstDateIndex > 1) namaIndex = 1;
+    else namaIndex = 0;
+  }
+
+  const dateIdx = [];
+  const dates = [];
   header.forEach((h,i)=>{
-    if(i < 2){ idx.push(i); return; }
     const d = parseRosterDate(h);
     if(d && d >= today && d <= end){
-      idx.push(i);
+      dateIdx.push(i);
       dates.push(d);
     }
   });
@@ -248,10 +265,11 @@ fetch('Roster.csv',{cache:'no-store'})
 
   let html = '<thead>';
   html += '<tr class="sticky-top">';
+  html += '<th class="col-nik border" rowspan="2">NIK</th>';
+  html += '<th class="col-nama border" rowspan="2">NAMA</th>';
+
   let lastM = null;
-  idx.forEach(i=>{
-    if(i===0){ html += '<th class="col-nik border" rowspan="2">NIK</th>'; return; }
-    if(i===1){ html += '<th class="col-nama border" rowspan="2">NAMA</th>'; return; }
+  dateIdx.forEach(i=>{
     const d = parseRosterDate(header[i]);
     if(lastM !== null && d.getMonth() !== lastM) html += '<th class="month-separator" rowspan="2"></th>';
     html += `<th class="border text-center ${d.getTime()===today.getTime()?'today-header':''}">${d.getDate()}</th>`;
@@ -261,8 +279,7 @@ fetch('Roster.csv',{cache:'no-store'})
 
   html += '<tr class="sticky-top">';
   lastM = null;
-  idx.forEach(i=>{
-    if(i < 2) return;
+  dateIdx.forEach(i=>{
     const d = parseRosterDate(header[i]);
     if(lastM !== null && d.getMonth() !== lastM) html += '';
     const hari = (rows[1] && rows[1][i]) ? rows[1][i] : '';
@@ -279,15 +296,18 @@ fetch('Roster.csv',{cache:'no-store'})
       return;
     }
 
-    if(!r[0] && !r[1]) return;
+    if(!r.some(c => String(c || '').trim())) return;
+
+    const nik = nikIndex >= 0 ? (r[nikIndex] || '') : '';
+    const nama = namaIndex >= 0 ? (r[namaIndex] || '') : '';
+    if(!nik && !nama) return;
 
     html += '<tr>';
+    html += `<td class="border col-nik">${nik}</td>`;
+    html += `<td class="border col-nama">${nama}</td>`;
+
     lastM = null;
-    idx.forEach(i=>{
-      if(i < 2){
-        html += `<td class="border ${i===0?'col-nik':'col-nama'}">${r[i] || ''}</td>`;
-        return;
-      }
+    dateIdx.forEach(i=>{
       const d = parseRosterDate(header[i]);
       if(lastM !== null && d.getMonth() !== lastM) html += '<td class="month-separator"></td>';
       const shift = normalizeShift(r[i]);
