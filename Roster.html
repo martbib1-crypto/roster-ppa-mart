@@ -8,8 +8,8 @@
 :root{--red:#e52329;--navy:#162238;--bg:#f3f5f8;--line:#d9dee7;--muted:#667085;--card:#fff}
 *{box-sizing:border-box}body{margin:0;font:11px/1.3 Arial,Helvetica,sans-serif;color:#172033;background:var(--bg)}
 .app{max-width:100%;padding:8px}.header{display:flex;align-items:center;gap:9px;margin-bottom:7px}.logo{width:48px;height:48px;object-fit:contain}.title h1{margin:0;font-size:18px}.title p{margin:2px 0 0;font-size:10px;color:var(--muted)}
-.toolbar,.stats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}.toolbar{align-items:end;background:#fff;padding:7px;border:1px solid var(--line);border-radius:10px;box-shadow:0 2px 8px #0000000a}.field{display:flex;flex-direction:column;gap:4px}.field label{font-size:11px;font-weight:700;color:#475467}.field input,.field select{height:28px;border:1px solid #cbd2dc;border-radius:6px;padding:0 9px;background:#fff;min-width:125px}.field.search input{min-width:210px}
-button,.file-label{height:28px;border:0;border-radius:6px;padding:0 9px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}.primary{background:#1666c5;color:#fff}.export-group{display:flex;align-items:end;gap:5px}.export-group .field select{min-width:145px}.danger{background:var(--red);color:#fff}.secondary,.file-label{background:#eef1f5;color:#25324a}.status{margin-left:auto;color:#166534;font-size:11px;font-weight:700;align-self:center;background:#dcfce7;border:1px solid #86efac;border-radius:999px;padding:5px 9px}
+.toolbar,.stats{display:flex;gap:6px;margin-bottom:6px}.toolbar{flex-wrap:wrap;align-items:end;background:#fff;padding:7px;border:1px solid var(--line);border-radius:10px;box-shadow:0 2px 8px #0000000a}.field{display:flex;flex-direction:column;gap:4px}.field label{font-size:11px;font-weight:700;color:#475467}.field input,.field select{height:30px;border:1px solid #cbd2dc;border-radius:6px;padding:0 9px;background:#fff;min-width:125px}.field.search input{min-width:210px}.filters-row,.actions-row{display:flex;align-items:end;gap:6px}
+button,.file-label{height:30px;border:0;border-radius:6px;padding:0 10px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}.primary{background:#1666c5;color:#fff}.export-field select{min-width:145px}.danger{background:var(--red);color:#fff}.secondary,.file-label{background:#eef1f5;color:#25324a}.status{margin-left:auto;color:#166534;font-size:11px;font-weight:700;align-self:center;background:#dcfce7;border:1px solid #86efac;border-radius:999px;padding:5px 9px}
 .stat{background:#fff;border:1px solid var(--line);border-radius:7px;padding:5px 9px;min-width:92px}.stat b{display:block;font-size:14px}.stat span{font-size:9px;color:var(--muted)}
 .shift-guide{margin-top:10px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 2px 8px #0000000a;overflow:hidden}
 .shift-guide summary{cursor:pointer;padding:11px 13px;font-size:12px;font-weight:800;color:#25324a;list-style:none;display:flex;align-items:center;justify-content:space-between}
@@ -17,10 +17,23 @@ button,.file-label{height:28px;border:0;border-radius:6px;padding:0 9px;font-wei
 .shift-guide-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:0 12px 12px}
 .shift-card{display:grid;grid-template-columns:58px 1fr;gap:8px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:8px;background:#fafbfc}
 .shift-code{height:32px;border-radius:6px;border:1px solid #303846;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:11px}
-.shift-info strong{display:block;font-size:11px}.shift-info span{display:block;color:var(--muted);font-size:10px;margin-top:2px}.top-scroll{overflow-x:auto;overflow-y:hidden;height:16px;margin-bottom:3px;border:1px solid var(--line);border-radius:6px;background:#fff}.top-scroll-inner{height:1px}.table-wrap{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:auto;max-height:calc(100vh - 215px);box-shadow:0 2px 8px #0000000a}.meta{display:flex;gap:22px;padding:6px 9px;color:var(--muted);position:sticky;left:0;background:#fff;z-index:65;border-bottom:1px solid var(--line)}table{border-collapse:separate;border-spacing:0;width:max-content;min-width:0;table-layout:fixed}th,td{height:24px;padding:1px 2px;font-size:9px;width:34px;min-width:34px;max-width:34px;border-right:1px solid #3e4652;border-bottom:1px solid #3e4652;white-space:nowrap;text-align:center;overflow:hidden;text-overflow:clip}thead th{position:sticky;top:0;background:#e7eaf0;z-index:45}.head-day th{top:24px;font-size:8px;color:#475467}.col-nik{position:sticky;left:0;z-index:55;background:#fafafa;min-width:78px;max-width:78px;width:78px}.col-nama{position:sticky;left:78px;z-index:55;background:#fff;min-width:145px;max-width:145px;width:145px;text-align:left;font-weight:700;overflow:hidden;text-overflow:ellipsis}.section td{position:sticky;left:0;text-align:left;background:var(--navy);color:#fff;font-weight:800;padding-left:12px;z-index:30}.today{box-shadow:inset 3px 0 var(--red),inset -3px 0 var(--red)}.weekend-head{background:#ffe8e8!important;color:#a61b1b!important}.empty{padding:30px;text-align:center;color:var(--muted)}
+.shift-info strong{display:block;font-size:11px}.shift-info span{display:block;color:var(--muted);font-size:10px;margin-top:2px}.top-scroll{overflow-x:auto;overflow-y:hidden;height:16px;margin-bottom:3px;border:1px solid var(--line);border-radius:6px;background:#fff}.top-scroll-inner{height:1px}.table-wrap{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:auto;max-height:calc(100vh - 190px);box-shadow:0 2px 8px #0000000a}.meta{display:flex;gap:22px;padding:6px 9px;color:var(--muted);position:sticky;left:0;background:#fff;z-index:65;border-bottom:1px solid var(--line)}table{border-collapse:separate;border-spacing:0;width:max-content;min-width:0;table-layout:fixed}th,td{height:24px;padding:1px 2px;font-size:9px;width:34px;min-width:34px;max-width:34px;border-right:1px solid #3e4652;border-bottom:1px solid #3e4652;white-space:nowrap;text-align:center;overflow:hidden;text-overflow:clip}thead th{position:sticky;top:0;background:#e7eaf0;z-index:45}.head-day th{top:24px;font-size:8px;color:#475467}.col-nik{position:sticky;left:0;z-index:55;background:#fafafa;min-width:78px;max-width:78px;width:78px}.col-nama{position:sticky;left:78px;z-index:55;background:#fff;min-width:145px;max-width:145px;width:145px;text-align:left;font-weight:700;overflow:hidden;text-overflow:ellipsis}.section td{position:sticky;left:0;text-align:left;background:var(--navy);color:#fff;font-weight:800;padding-left:12px;z-index:30}.today{box-shadow:inset 3px 0 var(--red),inset -3px 0 var(--red)}.weekend-head{background:#ffe8e8!important;color:#a61b1b!important}.empty{padding:30px;text-align:center;color:var(--muted)}
 .shift-P{background:#056bff;color:#fff}.shift-S{background:#1ee91e}.shift-M,.shift-IND{background:#ffd56a}.shift-C{background:#777;color:#fff}.shift-OFF{background:#f31318;color:#fff}.shift-STN{background:#fff}.shift-PMO{background:#0f766e;color:#fff}.shift-POP{background:#f5df00}.shift-PMP{background:#fb923c}.shift-SMP{background:#7c3aed;color:#fff}.shift-MOP{background:#fff}.shift-UNKNOWN{background:#f8fafc;color:#475467}
 .hidden{display:none!important}.note{font-size:11px;color:var(--muted);margin-top:8px}.error{color:#b42318;font-weight:700}
-@media(max-width:700px){.shift-guide-grid{grid-template-columns:1fr}.app{padding:8px}.header{gap:8px}.logo{width:52px;height:52px}.title h1{font-size:18px}.field,.field input,.field select,.field.search input{width:100%;min-width:0}.status{margin-left:0;width:100%}.col-nik{left:0;min-width:72px;max-width:72px;width:72px}.col-nama{left:72px;min-width:135px;max-width:135px;width:135px}}
+@media(max-width:700px){
+.shift-guide-grid{grid-template-columns:1fr}
+.app{padding:8px}.header{gap:8px}.logo{width:52px;height:52px}.title h1{font-size:18px}
+.toolbar{display:grid;grid-template-columns:1fr;padding:10px;gap:8px}
+.field,.field input,.field select,.field.search input{width:100%;min-width:0}
+.filters-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.actions-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px;align-items:end}
+.actions-row button{padding:0 11px}
+.actions-row .primary{min-width:92px}.actions-row .danger{min-width:96px}
+.status{margin-left:0;width:100%;justify-self:stretch;text-align:center;padding:6px 9px}
+.stats{flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.stats::-webkit-scrollbar{display:none}.stat{flex:0 0 104px;min-width:104px}
+.col-nik{left:0;min-width:72px;max-width:72px;width:72px}.col-nama{left:72px;min-width:135px;max-width:135px;width:135px}
+}
 @media print{.top-scroll{display:none!important}body{background:#fff}.toolbar,.shift-guide,.note{display:none!important}.app{padding:0}.header{margin-bottom:6px}.logo{width:45px;height:45px}.stats{margin-bottom:6px}.stat{padding:4px 8px}.stat b{font-size:14px}.table-wrap{max-height:none;overflow:visible;border:0;box-shadow:none}.meta{position:static;padding:5px 0}thead{display:table-header-group}thead th{position:static}.col-nik,.col-nama,.section td{position:static}th,td{height:24px;font-size:9px;padding:2px 3px}@page{size:A3 landscape;margin:8mm}}
 </style>
 </head>
@@ -33,10 +46,14 @@ button,.file-label{height:28px;border:0;border-radius:6px;padding:0 9px;font-wei
 
   <section class="toolbar">
     <div class="field search"><label>Cari NIK / Nama</label><input id="search" type="search" placeholder="Ketik nama atau NIK..."></div>
-    <div class="field"><label>Divisi</label><select id="division"><option value="ALL">Semua Divisi</option></select></div>
-    <div class="field"><label>Shift hari ini</label><select id="shiftFilter"><option value="ALL">Semua Shift</option></select></div>
-    <div class="export-group">
-      <div class="field">
+
+    <div class="filters-row">
+      <div class="field"><label>Divisi</label><select id="division"><option value="ALL">Semua Divisi</option></select></div>
+      <div class="field"><label>Shift hari ini</label><select id="shiftFilter"><option value="ALL">Semua Shift</option></select></div>
+    </div>
+
+    <div class="actions-row">
+      <div class="field export-field">
         <label>Export CSV</label>
         <select id="csvExport">
           <option value="ALL">Semua Karyawan</option>
@@ -45,9 +62,10 @@ button,.file-label{height:28px;border:0;border-radius:6px;padding:0 9px;font-wei
           <option value="BACK OFFICE">Back Office</option>
         </select>
       </div>
-      <button class="primary" id="downloadCsv">Download CSV</button>
+      <button class="primary" id="downloadCsv">Unduh CSV</button>
+      <button class="danger" id="printPDF">Cetak / PDF</button>
     </div>
-    <button class="danger" id="printPDF">Cetak / PDF</button>
+
     <span class="status" id="status">● Memuat data...</span>
   </section>
 
@@ -65,7 +83,7 @@ button,.file-label{height:28px;border:0;border-radius:6px;padding:0 9px;font-wei
       <div class="shift-card"><div class="shift-code shift-P">P</div><div class="shift-info"><strong>Pagi Mess Baru</strong><span>04:45 – 15:45</span></div></div>
       <div class="shift-card"><div class="shift-code shift-PMO">P MO</div><div class="shift-info"><strong>Main Office</strong><span>07:00 – 18:00</span></div></div>
       <div class="shift-card"><div class="shift-code shift-POP">P OP</div><div class="shift-info"><strong>Pagi Plant</strong><span>06:00 – 17:00</span></div></div>
-      <div class="shift-card"><div class="shift-code shift-MOP">M OP</div><div class="shift-info"><strong>Malam Plant</strong><span>17:00 – 06:00</span></div></div>
+      <div class="shift-card"><div class="shift-code shift-MOP">M OP</div><div class="shift-info"><strong>Malam Plant</strong><span>18:00 – 05:00</span></div></div>
       <div class="shift-card"><div class="shift-code shift-PMP">P MP</div><div class="shift-info"><strong>Pagi Manpower</strong><span>06:00 – 17:00</span></div></div>
       <div class="shift-card"><div class="shift-code shift-SMP">S MP</div><div class="shift-info"><strong>Siang Manpower</strong><span>11:00 – 22:00</span></div></div>
       <div class="shift-card"><div class="shift-code shift-S">S</div><div class="shift-info"><strong>Siang Mess Baru</strong><span>11:00 – 22:00</span></div></div>
@@ -85,7 +103,7 @@ const CONFIG={csv:'Roster.csv',refreshMs:60000,daysAhead:30,shifts:{
 P:{name:'Pagi Mess Baru',time:'04:45 – 15:45',className:'P'},
 PMO:{name:'Main Office',time:'07:00 – 18:00',className:'PMO'},
 POP:{name:'Pagi Plant',time:'06:00 – 17:00',className:'POP'},
-MOP:{name:'Malam Plant',time:'17:00 – 06:00',className:'MOP'},
+MOP:{name:'Malam Plant',time:'18:00 – 05:00',className:'MOP'},
 PMP:{name:'Pagi Manpower',time:'06:00 – 17:00',className:'PMP'},
 SMP:{name:'Siang Manpower',time:'11:00 – 22:00',className:'SMP'},
 S:{name:'Siang Mess Baru',time:'11:00 – 22:00',className:'S'},
